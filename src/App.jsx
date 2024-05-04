@@ -1,9 +1,11 @@
-import "./App.css";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import usePeerStateSync from "./hooks/usePeerStateSync";
-import { PeerContext } from "./main";
 import LocalGame from "./GameBoard";
 import logic from "./game.js";
+import "./App.css";
+import { PeerContext } from "./context.js";
+import { BASE_IDENTIFIER } from "./constants.js";
+import Toast from "./utils/toast";
 
 function App() {
   const peer = useContext(PeerContext);
@@ -14,7 +16,7 @@ function App() {
   const [connections, setConnections] = useState([]);
 
   const options = useMemo(
-    () => ({ players: Object.keys(connections).length + 1 }),
+    () => ({ players: 2 || Object.keys(connections).length + 1 }),
     [connections]
   );
   const board = useMemo(() => new logic(options), [options]);
@@ -33,11 +35,14 @@ function App() {
     isHost
   );
 
-  // * sync the internal board logic
+  const [turnNo, setTurnNo] = useState(0);
+
+  // * sync the entire internal board logic
   useEffect(() => {
-    if (sharedState.lastPos) {
-      board.add(sharedState.lastPos);
-    }
+    console.log("updating internal board");
+    board.game = sharedState.game;
+    board.players = sharedState.players;
+    board.turn = sharedState.turn;
   }, [sharedState]);
 
   function onConnection() {
@@ -58,12 +63,17 @@ function App() {
   }, []);
 
   function handleConnect() {
-    let connection = peer.connect(connectToId);
+    let fullId = BASE_IDENTIFIER + connectToId;
+
+    let connection = peer.connect(fullId);
 
     connection.on("open", () => {
       connection.on("error", console.log);
 
       console.log("Connection established");
+
+      setTurnNo(Object.keys(peer.connections).length);
+
       onConnection(connection);
       registerConnection(connection);
     });
@@ -73,57 +83,68 @@ function App() {
     console.log("sharedState: ", sharedState);
   }, [sharedState]);
 
-  return (
-    <div className="flex flex-col text-white gap-4 p-4">
-      <div>My peer id: {peerId}</div>
-      <div className="flex gap-4">
-        <div>Is Host: </div>
-        <input
-          type="checkbox"
-          value={isHost}
-          onChange={(e) => setIsHost(e.target.checked)}
-        />
-      </div>
-      <div className="flex gap-4">
-        <div>Connect To:</div>
-        <input
-          className="text-black"
-          type="text"
-          value={connectToId}
-          onChange={(e) => setConnectToId(e.target.value)}
-        />
-        <button className="bg-blue-500" onClick={handleConnect}>
-          Connect
-        </button>
-      </div>
-      <div>Connected To: {Object.keys(connections)}</div>
-      {Object.keys(connections).length > 0 && (
-        <button
-          className="bg-blue-500"
-          onClick={() => setSharedState({ ...initGameState, isStarted: true })}
-        >
-          Start Game
-        </button>
-      )}
-      <textarea
-        className="hidden text-gray-800"
-        value={JSON.stringify(sharedState)}
-        onChange={(e) => setSharedState(e.target.value)}
-        name=""
-        id=""
-        cols="30"
-        rows="2"
-      ></textarea>
+  const toastRef = useRef();
+  function onError(error) {
+    console.log(error);
+    toastRef.current.raise();
+  }
 
-      {sharedState.isStarted && (
-        <LocalGame
-          board={board}
-          game={sharedState}
-          setGame={setSharedState}
-          options={options}
-        />
-      )}
-    </div>
+  return (
+    <>
+      <Toast ref={toastRef}>It&apos;s Not your Turn</Toast>
+      <div className="flex flex-col text-white gap-4 p-4">
+        <div>My peer id: {peerId?.replace(BASE_IDENTIFIER, "")}</div>
+        <div className="flex gap-4">
+          <div>Is Host: </div>
+          <input
+            type="checkbox"
+            value={isHost}
+            onChange={(e) => setIsHost(e.target.checked)}
+          />
+        </div>
+        {!isHost && (
+          <div className="flex gap-4 items-center">
+            <div>Connect To:</div>
+            <input
+              className="text-black p-2"
+              type="text"
+              value={connectToId}
+              onChange={(e) => setConnectToId(e.target.value)}
+            />
+            <button className="bg-blue-500 p-2" onClick={handleConnect}>
+              Connect
+            </button>
+          </div>
+        )}
+        <div>Connected To: {Object.keys(connections)}</div>
+        {Object.keys(connections).length > 0 && !sharedState.isStarted && (
+          <button
+            className="bg-blue-500"
+            onClick={() => setSharedState({ ...sharedState, isStarted: true })}
+          >
+            Start Game
+          </button>
+        )}
+
+        <button
+          className="bg-red-500 "
+          onClick={() => setSharedState({ ...sharedState })}
+        >
+          Force Sync
+        </button>
+
+        {sharedState.isStarted && (
+          <LocalGame
+            turn={turnNo}
+            board={board}
+            game={sharedState}
+            setGame={setSharedState}
+            options={options}
+            onError={onError}
+          />
+        )}
+      </div>
+    </>
   );
 }
 

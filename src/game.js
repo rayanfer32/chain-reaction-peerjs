@@ -6,14 +6,14 @@ export default class game {
       })
     );
     this.players = [
-      'red',
-      'green',
-      'blue',
-      'yellow',
-      'pink',
-      'indigo',
-      'purple',
-      'gray',
+      "red",
+      "green",
+      "blue",
+      "yellow",
+      "pink",
+      "indigo",
+      "purple",
+      "gray",
     ].slice(0, options.players);
     this.turn = 0;
     this.check = false;

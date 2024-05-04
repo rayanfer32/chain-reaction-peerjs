@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-// import logic from './game.js';
+import logic from "./game.js";
 
 function Atoms({ mass, color }) {
   switch (mass) {
@@ -45,7 +45,7 @@ function Atoms({ mass, color }) {
   return <div className="animate-spin"></div>;
 }
 
-const LocalGame = ({ board, options, game, setGame }) => {
+const LocalGame = ({ turn, options, board, game, setGame, onError }) => {
   // const board = useMemo(() => new logic(options), [options]);
   // const [game, setGame] = useState({
   //   game: board.game,
@@ -55,10 +55,19 @@ const LocalGame = ({ board, options, game, setGame }) => {
 
   const add = useCallback(
     (i, j) => {
+      // * prevent adding atoms when not your turn
+      if (turn != board.turn) {
+        // alert("it's not your turn");
+        onError("It's not your turn");
+        return;
+      }
+
       // var pos = JSON.parse(event.target.id);
       var pos = [i, j];
       console.log("pos@", pos);
       board.add(pos);
+
+      // todo: prevent caling setGame if player clicks on other players atoms
       setGame({
         ...game,
         game: board.game,
@@ -67,7 +76,7 @@ const LocalGame = ({ board, options, game, setGame }) => {
         lastPos: pos,
       });
     },
-    [board]
+    [game]
   );
 
   // todo: when the grid line is clicked 0,0 pos is sent, which should be prevented.
@@ -99,6 +108,12 @@ const LocalGame = ({ board, options, game, setGame }) => {
     );
   };
 
+  let isTurn = turn == game.turn;
+  let shadowColor = "shadow-" + game.players[game.turn] + "-600";
+  let bgColor = "bg-" + game.players[game.turn] + "-800";
+  let activeTurnColor =
+    isTurn && `${bgColor} bg-opacity-20 ${shadowColor} shadow-lg animate-pulse`;
+
   return (
     <>
       {game.players.length > 1 ? (
@@ -106,7 +121,7 @@ const LocalGame = ({ board, options, game, setGame }) => {
           <table
             className={`m-auto border-${
               game.players[game.turn]
-            }-600 text-gray-300 text-3xl`}
+            }-600 ${activeTurnColor} text-gray-300 text-3xl`}
           >
             <tbody>{draw()}</tbody>
           </table>
@@ -123,11 +138,17 @@ const LocalGame = ({ board, options, game, setGame }) => {
           </h1>
           <button
             onClick={() => {
-              window.location.reload();
+              let board = new logic({ players: 2 });
+              setGame({
+                game: board.game,
+                players: board.players,
+                turn: board.turn,
+                isStarted: true,
+              });
             }}
             className={`bg-green-600 bg-opacity-50 hover:bg-opacity-100 mt-16 py-2 rounded-sm`}
           >
-            Return to Main Menu
+            Re-match
           </button>
         </div>
       )}

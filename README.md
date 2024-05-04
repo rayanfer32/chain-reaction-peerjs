@@ -1,8 +1,13 @@
-# React + Vite
+### Serverless P2P - Chain React Multiplayer Game  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### Done 
+* Play red vs green using peer to peer connection.
+* Deploy as a static page on github.io 
+* No servers used.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Todo
+* Options to choose number of players 
+* Update the number players based on the connections
+* Option to share the play link with the hostId 
+* Remove all the debug loggers
+* Hide the connect to field , isHost checkbox when game is started.
