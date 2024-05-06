@@ -1,13 +1,14 @@
-### Serverless P2P - Chain React Multiplayer Game  
-
-### Done 
-* Play red vs green using peer to peer connection.
-* Deploy as a static page on github.io 
-* No servers used.
+### Serverless P2P - Chain Reaction Multiplayer Game
 
 ### Todo
-* Options to choose number of players 
-* Update the number players based on the connections
-* Option to share the play link with the hostId 
-* Remove all the debug loggers
-* Hide the connect to field , isHost checkbox when game is started.
+- Options to choose number of players
+- Hide the connect to field , isHost checkbox when game is started.
+- Update the number players based on the connections
+- Remove all the debug loggers
+
+### Done
+- Join or Create toggle 
+- Option to share the play link with the hostId
+- Play red vs green using peer to peer connection.
+- Deploy as a static page on github.io
+- No servers used.

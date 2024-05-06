@@ -31,7 +31,7 @@ const Toast = forwardRef(function Toast(props, ref) {
   return (
     <div
       ref={toastRef}
-      className="toast-container absolute left-0 -top-20 flex justify-center items-center w-full duration-1000 ease-in"
+      className="toast-container absolute left-0 -top-20 flex justify-center items-center w-full duration-100 ease-out"
     >
       <div className="bg-white p-4 transition">
         {children || "Toast content"}
