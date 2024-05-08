@@ -93,7 +93,7 @@ const LocalGame = ({ turn, options, board, game, setGame, onError }) => {
                     key={j}
                     // onClick={add.bind(this)}
                     onClick={() => add(i, j)}
-                    className={`w-16 h-16 border-4 border-${
+                    className={`w-16 h-16 border-2 border-${
                       game.players[game.turn]
                     }-600 text-${game.game[i][j].player}-600 transition-all`}
                   >

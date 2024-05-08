@@ -5,6 +5,8 @@
 - Hide the connect to field , isHost checkbox when game is started.
 - Update the number players based on the connections
 - Remove all the debug loggers
+- Animate the explosion 
+- Have a slight delay to show the explosion
 
 ### Done
 - Join or Create toggle 
